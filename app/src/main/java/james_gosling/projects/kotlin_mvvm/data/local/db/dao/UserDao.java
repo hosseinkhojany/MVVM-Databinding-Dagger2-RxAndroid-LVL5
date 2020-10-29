@@ -29,6 +29,9 @@ public interface UserDao {
     @Query("SELECT * FROM users")
     Single<List<User>> getAll();
 
+    @Query("SELECT * FROM users WHERE id IN (:userIds)")
+    Single<List<User>> getAllByIds(List<User> userIds);
+
 
 
 
