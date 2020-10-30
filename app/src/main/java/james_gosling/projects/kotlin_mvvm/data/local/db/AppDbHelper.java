@@ -1,8 +1,6 @@
 package james_gosling.projects.kotlin_mvvm.data.local.db;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -14,7 +12,7 @@ import james_gosling.projects.kotlin_mvvm.data.model.db.User;
 @Singleton
 public class AppDbHelper implements DbHelper {
 
-    private AppDatabase appDatabase = null;
+    private final AppDatabase appDatabase;
 
     @Inject
     public AppDbHelper(AppDatabase appDatabase){
@@ -38,12 +36,9 @@ public class AppDbHelper implements DbHelper {
 
     @Override
     public Observable<Boolean> insertUser(User user) {
-        return Observable.fromCallable(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                appDatabase.userDao().insert(user);
-                return true;
-            }
+        return Observable.fromCallable(() -> {
+            appDatabase.userDao().insert(user);
+            return true;
         });
     }
 
@@ -55,26 +50,39 @@ public class AppDbHelper implements DbHelper {
 
     @Override
     public Observable<Boolean> isQuestionEmpty() {
-        return null;
+        return appDatabase.questionDao().getAll()
+                .flatMapObservable(questionList -> Observable.just(questionList.isEmpty()));
     }
 
     @Override
     public Observable<Boolean> saveOption(Option option) {
-        return null;
+        return Observable.fromCallable(() -> {
+            appDatabase.optionDao().insert(option);
+            return true;
+        });
     }
 
     @Override
     public Observable<Boolean> saveOptionList(List<Option> optionList) {
-        return null;
+        return Observable.fromCallable(() -> {
+            appDatabase.optionDao().insertAll(optionList);
+            return true;
+        });
     }
 
     @Override
     public Observable<Boolean> saveQuestion(Question question) {
-        return null;
+        return Observable.fromCallable(() -> {
+            appDatabase.questionDao().insert(question);
+            return true;
+        });
     }
 
     @Override
     public Observable<Boolean> saveQuestionList(List<Question> questionList) {
-        return null;
+        return Observable.fromCallable(() -> {
+            appDatabase.questionDao().insertAll(questionList);
+            return true;
+        });
     }
 }
